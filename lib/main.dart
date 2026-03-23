@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'firebase_options.dart';
 import 'screens/auth_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +21,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: AuthScreen(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          
+          // 🔄 Mientras carga
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // 🟢 Usuario logueado
+          if (snapshot.hasData) {
+            return const HomeScreen();
+          }
+
+          // 🔴 Usuario NO logueado
+          return const AuthScreen();
+        },
+      ),
     );
   }
 }
