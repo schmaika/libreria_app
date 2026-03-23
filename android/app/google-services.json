@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "712585116915",
+    "project_id": "libreria-zaitec",
+    "storage_bucket": "libreria-zaitec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712585116915:android:ac81711005467e064f8b86",
+        "android_client_info": {
+          "package_name": "com.example.libreria_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn5nqR_bNIa5P1PWm5swAXhHwqxH1gjww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712585116915:android:6973678c3c5962ff4f8b86",
+        "android_client_info": {
+          "package_name": "com.zaitec.libreria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn5nqR_bNIa5P1PWm5swAXhHwqxH1gjww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
