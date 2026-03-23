@@ -36,11 +36,11 @@ class MyApp extends StatelessWidget {
 
           // 🟢 Usuario logueado
           if (snapshot.hasData) {
-            return const HomeScreen();
+            return HomeScreen();
           }
 
           // 🔴 Usuario NO logueado
-          return const AuthScreen();
+          return AuthScreen();
         },
       ),
     );
