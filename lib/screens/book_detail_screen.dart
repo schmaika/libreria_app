@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
@@ -41,9 +43,19 @@ class BookDetailScreen extends StatelessWidget {
             const SizedBox(height: 30),
 
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Reservar'),
-            ),
+              onPressed: () async {
+                await FirebaseFirestore.instance.collection('reservations').add({
+                  'title': title,
+                  'author': author,
+                  'date': DateTime.now().toString(),
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Reserva guardada 🔥')),
+    );
+  },
+  child: const Text('Reservar'),
+),
 
             const SizedBox(height: 10),
 
