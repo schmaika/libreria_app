@@ -43,19 +43,19 @@ class BookDetailScreen extends StatelessWidget {
 
                       if (user == null) return;
 
-                      await FirebaseFirestore.instance
-                          .collection('reservations')
-                          .add({
+                      final now = DateTime.now();
+                      final returnDate = now.add(const Duration(days: 14));
+
+                      await FirebaseFirestore.instance.collection('reservations').add({
                         'title': title,
                         'author': author,
                         'userId': user.uid,
-                        'date': DateTime.now().toString(),
+                        'reservationDate': now.toString(),
+                        'returnDate': returnDate.toString(), // 🔥 NUEVO
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Reserva guardada 🔥'),
-                        ),
+                        const SnackBar(content: Text('Reserva guardada 🔥')),
                       );
                     },
                     child: const Text('Reservar'),
