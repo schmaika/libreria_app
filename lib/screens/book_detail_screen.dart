@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final String title;
@@ -21,10 +21,8 @@ class BookDetailScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.book, size: 100),
-            const SizedBox(height: 20),
-
             Text(
               title,
               style: const TextStyle(
@@ -32,36 +30,51 @@ class BookDetailScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 10),
-
-            Text(
-              author,
-              style: const TextStyle(color: Colors.grey),
-            ),
-
+            Text(author),
             const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: () async {
-                await FirebaseFirestore.instance.collection('reservations').add({
-                  'title': title,
-                  'author': author,
-                  'date': DateTime.now().toString(),
-    });
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Reserva guardada 🔥')),
-    );
-  },
-  child: const Text('Reservar'),
-),
+                      if (user == null) return;
 
-            const SizedBox(height: 10),
+                      await FirebaseFirestore.instance
+                          .collection('reservations')
+                          .add({
+                        'title': title,
+                        'author': author,
+                        'userId': user.uid,
+                        'date': DateTime.now().toString(),
+                      });
 
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Comprar'),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Reserva guardada 🔥'),
+                        ),
+                      );
+                    },
+                    child: const Text('Reservar'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Compra no disponible aún 💸'),
+                        ),
+                      );
+                    },
+                    child: const Text('Comprar'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
