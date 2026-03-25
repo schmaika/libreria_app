@@ -29,7 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
           password: passwordController.text.trim(),
         );
       }
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('✅ Éxito')),
       );

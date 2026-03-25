@@ -56,6 +56,7 @@ class BookDetailScreen extends StatelessWidget {
                             .get();
 
                       if (existing.docs.isNotEmpty) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Ya has reservado este libro'))
                         );
@@ -72,6 +73,8 @@ class BookDetailScreen extends StatelessWidget {
                         'returnDate': returnDate.toString(), 
                       });
 
+                      if (!context.mounted) return;
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Reserva guardada 🔥')),
                       );
