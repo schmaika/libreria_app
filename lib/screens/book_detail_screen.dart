@@ -46,12 +46,27 @@ class BookDetailScreen extends StatelessWidget {
                       final now = DateTime.now();
                       final returnDate = now.add(const Duration(days: 14));
 
+                      // Comprobar si ya existe reserva
+                      final existing = await FirebaseFirestore.instance
+                            .collection('reservations')
+                            .where('userId', isEqualTo: user.uid)
+                            .where('title', isEqualTo: title)
+                            .get();
+
+                      if (existing.docs.isNotEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Ya has reservado este libro'))
+                        );
+                        return;
+                      }
+
+                      // Guardar si no existe
                       await FirebaseFirestore.instance.collection('reservations').add({
                         'title': title,
                         'author': author,
                         'userId': user.uid,
                         'reservationDate': now.toString(),
-                        'returnDate': returnDate.toString(), // 🔥 NUEVO
+                        'returnDate': returnDate.toString(), 
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
