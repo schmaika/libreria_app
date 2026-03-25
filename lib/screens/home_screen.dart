@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:libreria_app/firebase_service.dart';
+import 'package:libreria_app/models/book.dart';
+import 'package:libreria_app/screens/add_Book_Screen.dart';
 import 'book_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -25,8 +24,8 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
 
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('books').snapshots(),
+      body: StreamBuilder<List<Book>>(
+        stream: getBooksStream(),
         builder: (context, snapshot) {
           // Cargando
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -38,7 +37,7 @@ class HomeScreen extends StatelessWidget {
             return const Center(child: Text('Error cargando libros'));
           }
 
-          final books = snapshot.data?.docs ?? [];
+          final books = snapshot.data ?? [];
 
           // Sin datos
           if (books.isEmpty) {
@@ -48,10 +47,7 @@ class HomeScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: books.length,
             itemBuilder: (context, index) {
-              final data = books[index].data() as Map<String, dynamic>;
-
-              final title = data['title'] ?? 'Sin título';
-              final author = data['author'] ?? 'Sin autor';
+              final book = books[index];
 
               return GestureDetector(
                 onTap: () {
@@ -59,8 +55,14 @@ class HomeScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => BookDetailScreen(
-                        title: title,
-                        author: author,
+                        docId: book.docId!,
+                        title: book.title,
+                        author: book.author,
+                        isbn: book.isbn,
+                        description: book.description,
+                        //imageUrl: book.imageUrl,
+                        price: book.price,
+                        isAvailable: book.isAvailable,
                       ),
                     ),
                   );
@@ -96,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              title,
+                              book.title,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -104,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              author,
+                              book.author,
                               style: const TextStyle(
                                 color: Colors.grey,
                               ),
@@ -119,6 +121,17 @@ class HomeScreen extends StatelessWidget {
             },
           );
         },
+      ),
+
+      //Botón para añadir un nuevo libro
+      floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AddBookScreen()),
+      );
+      },
+      child: const Icon(Icons.add),
       ),
     );
   }
