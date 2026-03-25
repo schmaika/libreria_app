@@ -84,18 +84,42 @@ class MyReservationsScreen extends StatelessWidget {
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
-                          await FirebaseFirestore.instance
-                              .collection('reservations')
-                              .doc(doc.id)
-                              .delete();
-
-                          if (!context.mounted) return;
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Reserva cancelada 🗑️'),
+                          final confirm = await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Cancelar reserva'),
+                              content: const Text('¿Estás seguro?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: const Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text('Sí'),
+                                ),
+                              ],
                             ),
                           );
+
+                          if (confirm == true) {
+                            await FirebaseFirestore.instance
+                                .collection('reservations')
+                                .doc(doc.id)
+                                .delete();
+
+                            if (!context.mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Reserva cancelada 🗑️'),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),
