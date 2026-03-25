@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart'; // IMPORTANTE
+import 'package:intl/date_symbol_data_local.dart';
 
 class MyReservationsScreen extends StatelessWidget {
   const MyReservationsScreen({super.key});
@@ -21,8 +21,6 @@ class MyReservationsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mis reservas 📚'),
       ),
-
-      // INICIALIZAMOS EL LOCALE AQUÍ
       body: FutureBuilder(
         future: initializeDateFormatting('es'),
         builder: (context, snapshot) {
@@ -53,26 +51,53 @@ class MyReservationsScreen extends StatelessWidget {
               return ListView.builder(
                 itemCount: reservations.length,
                 itemBuilder: (context, index) {
-                  final data =
-                      reservations[index].data() as Map<String, dynamic>;
+                  final doc = reservations[index];
+                  final data = doc.data() as Map<String, dynamic>;
 
                   final title = data['title'] ?? 'Sin título';
 
                   String formattedDate = 'Sin fecha';
+                  bool isExpired = false;
 
                   if (data['returnDate'] != null) {
                     final date = DateTime.parse(data['returnDate']);
                     formattedDate =
                         DateFormat('d MMMM', 'es').format(date);
+
+                    final now = DateTime.now();
+                    isExpired = now.isAfter(date);
                   }
 
                   return Card(
+                    color: isExpired ? Colors.red[100] : null,
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
                       leading: const Icon(Icons.book),
                       title: Text(title),
-                      subtitle:
-                          Text('Devolver antes de: $formattedDate'),
+
+                      subtitle: Text(
+                        isExpired
+                            ? 'Reserva vencida ❌'
+                            : 'Devolver antes de: $formattedDate',
+                      ),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await FirebaseFirestore.instance
+                              .collection('reservations')
+                              .doc(doc.id)
+                              .delete();
+
+                          if (!context.mounted) return;
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Reserva cancelada 🗑️'),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   );
                 },
