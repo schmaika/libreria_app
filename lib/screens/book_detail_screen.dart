@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
 
-  const BookDetailScreen({
-    super.key,
-    required this.title,
-    required this.author,
-  });
+  BookDetailScreen({required this.title, required this.author});
 
   @override
   Widget build(BuildContext context) {
@@ -16,40 +13,35 @@ class BookDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.book, size: 100),
-            const SizedBox(height: 20),
-
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Text(
-              author,
-              style: const TextStyle(color: Colors.grey),
-            ),
-
-            const SizedBox(height: 30),
-
+            Text(title,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(author),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Reservar'),
-            ),
-
-            const SizedBox(height: 10),
-
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Comprar'),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: SizedBox(
+                      height: 400,
+                      width: 300,
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2024, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: DateTime.now(),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: Text("Reservar Ahora"),
             ),
           ],
         ),
