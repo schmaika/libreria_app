@@ -3,19 +3,32 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'book_detail_screen.dart';
+import 'my_reservations_screen.dart'; // 🔥 NUEVO
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('Home 📚'),
         actions: [
+          // BOTÓN MIS RESERVAS
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyReservationsScreen(),
+                ),
+              );
+            },
+          ),
+
+          // LOGOUT
           IconButton(
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
@@ -61,6 +74,7 @@ class HomeScreen extends StatelessWidget {
                       builder: (_) => BookDetailScreen(
                         title: title,
                         author: author,
+                        bookId: books[index].id,
                       ),
                     ),
                   );

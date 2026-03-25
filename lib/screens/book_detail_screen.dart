@@ -5,11 +5,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
+  final String bookId;
 
   const BookDetailScreen({
     super.key,
     required this.title,
     required this.author,
+    required this.bookId,
   });
 
   @override
@@ -62,6 +64,7 @@ class BookDetailScreen extends StatelessWidget {
 
                       // Guardar si no existe
                       await FirebaseFirestore.instance.collection('reservations').add({
+                        'bookId': bookId, // nuevo
                         'title': title,
                         'author': author,
                         'userId': user.uid,
