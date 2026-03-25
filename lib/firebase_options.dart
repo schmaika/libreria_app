@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'libreria-zaitec.firebasestorage.app',
     measurementId: 'G-22PMK0S656',
   );
+
 }

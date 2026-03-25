@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'book_detail_screen.dart';
-
+//Home
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
@@ -109,6 +109,15 @@ class HomeScreen extends StatelessWidget {
                                 color: Colors.grey,
                               ),
                             ),
+                            const SizedBox (height: 8),
+                            Text (
+                              '${data['price'] ?? '0.0'} €',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                ),
+                              ),
                           ],
                         ),
                       ),
