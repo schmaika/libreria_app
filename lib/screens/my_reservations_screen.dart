@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart'; // IMPORTANTE
 
 class MyReservationsScreen extends StatelessWidget {
   const MyReservationsScreen({super.key});
@@ -19,41 +21,61 @@ class MyReservationsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mis reservas 📚'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('reservations')
-            .where('userId', isEqualTo: user.uid)
-            .snapshots(),
+
+      // INICIALIZAMOS EL LOCALE AQUÍ
+      body: FutureBuilder(
+        future: initializeDateFormatting('es'),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error cargando reservas'));
-          }
+          return StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('reservations')
+                .where('userId', isEqualTo: user.uid)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          final reservations = snapshot.data?.docs ?? [];
+              if (snapshot.hasError) {
+                return const Center(child: Text('Error cargando reservas'));
+              }
 
-          if (reservations.isEmpty) {
-            return const Center(child: Text('No tienes reservas aún'));
-          }
+              final reservations = snapshot.data?.docs ?? [];
 
-          return ListView.builder(
-            itemCount: reservations.length,
-            itemBuilder: (context, index) {
-              final data = reservations[index].data() as Map<String, dynamic>;
+              if (reservations.isEmpty) {
+                return const Center(child: Text('No tienes reservas aún'));
+              }
 
-              final title = data['title'] ?? 'Sin título';
-              final returnDate = data['returnDate'] ?? 'Sin fecha';
+              return ListView.builder(
+                itemCount: reservations.length,
+                itemBuilder: (context, index) {
+                  final data =
+                      reservations[index].data() as Map<String, dynamic>;
 
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: ListTile(
-                  leading: const Icon(Icons.book),
-                  title: Text(title),
-                  subtitle: Text('Devolver antes de: $returnDate'),
-                ),
+                  final title = data['title'] ?? 'Sin título';
+
+                  String formattedDate = 'Sin fecha';
+
+                  if (data['returnDate'] != null) {
+                    final date = DateTime.parse(data['returnDate']);
+                    formattedDate =
+                        DateFormat('d MMMM', 'es').format(date);
+                  }
+
+                  return Card(
+                    margin: const EdgeInsets.all(10),
+                    child: ListTile(
+                      leading: const Icon(Icons.book),
+                      title: Text(title),
+                      subtitle:
+                          Text('Devolver antes de: $formattedDate'),
+                    ),
+                  );
+                },
               );
             },
           );
