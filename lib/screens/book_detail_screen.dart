@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:libreria_app/firebase_service.dart';
-import 'package:libreria_app/screens/edit_Book_Screen.dart';
+import 'package:libreria_app/screens/edit_book_screen.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final String docId;
