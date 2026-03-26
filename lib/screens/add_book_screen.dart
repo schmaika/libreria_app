@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:libreria_app/firebase_service.dart';
 
@@ -16,6 +17,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
   final TextEditingController _isbnController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _stockController = TextEditingController();
 
   bool _isSaving = false;
 
@@ -26,6 +28,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     _isbnController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
@@ -40,7 +43,8 @@ class _AddBookScreenState extends State<AddBookScreen> {
           'isbn': _isbnController.text.trim(),
           'description': _descriptionController.text.trim(),
           'price': double.tryParse(_priceController.text) ?? 0.0,
-          'isAvailable': true,
+          'stock': int.tryParse(_stockController.text) ?? 0,
+          'createdAt': FieldValue.serverTimestamp(),
         });
         
         if (mounted){
@@ -105,9 +109,16 @@ class _AddBookScreenState extends State<AddBookScreen> {
                   return null;
                 }
               ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _stockController,
+                decoration: const InputDecoration(labelText: 'Existencias (opcional)'),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.trim().isEmpty ? '¿Cuantas existencias hay?' : null,
+              ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: _saveBook,
+                onPressed: _isSaving ? null : _saveBook,
                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(15)),
                 child: const Text('Guardar Libro', style: TextStyle(fontSize: 18)),
               ),

@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:libreria_app/firebase_service.dart';
+import 'package:libreria_app/models/book.dart';
 
 class EditBookScreen extends StatefulWidget {
-  final String docId;
-  final String title;
-  final String author;
-  final String isbn;
-  final double price;
+  final Book book;
  
   const EditBookScreen({
     super.key,
-    required this.docId,
-    required this.title,
-    required this.author,
-    required this.isbn,
-    required this.price,
+    required this.book,
   });
 
   @override
@@ -27,17 +20,21 @@ class _EditBookScreenState extends State<EditBookScreen> {
   late TextEditingController _titleController;
   late TextEditingController _authorController;
   late TextEditingController _isbnController;
+  late TextEditingController _descriptionController;
   late TextEditingController _priceController;
+  late TextEditingController _stockController;
 
-   bool _isSaving = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.title);
-    _authorController = TextEditingController(text: widget.author);
-    _isbnController = TextEditingController(text: widget.isbn);
-    _priceController = TextEditingController(text: widget.price.toString());
+    _titleController = TextEditingController(text: widget.book.title);
+    _authorController = TextEditingController(text: widget.book.author);
+    _isbnController = TextEditingController(text: widget.book.isbn);
+    _descriptionController = TextEditingController(text: widget.book.description);
+    _priceController = TextEditingController(text: widget.book.price.toString());
+    _stockController = TextEditingController(text: widget.book.stock.toString());
   }
 
   @override
@@ -45,22 +42,28 @@ class _EditBookScreenState extends State<EditBookScreen> {
     _titleController.dispose();
     _authorController.dispose();
     _isbnController.dispose();
+    _descriptionController.dispose();
     _priceController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
   //Función actualizar el libro
   Future<void> _saveChanges() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isSaving = true);
+      setState(() => _isSaving = true);  //desactivamos el botón mientras se guarda
       try {
-        await updateBook(widget.docId, {
-          'title': _titleController.text.trim(),
-          'author': _authorController.text.trim(),
-          'isbn': _isbnController.text.trim(),
-          'price': double.tryParse(_priceController.text) ?? 0.0,
-        });
-        
+        final updatedBook = widget.book.copyWith(
+          title: _titleController.text.trim(),
+          author: _authorController.text.trim(),
+          isbn: _isbnController.text.trim(),
+          description: _descriptionController.text.trim(),
+          price: double.tryParse(_priceController.text) ?? 0.0,
+          stock: int.tryParse(_stockController.text) ?? 0,
+        );
+
+        await updateBook(updatedBook.docId, updatedBook.toFirestore());
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Libro actualizado correctamente')),
@@ -68,12 +71,14 @@ class _EditBookScreenState extends State<EditBookScreen> {
           Navigator.pop(context); // Volver atrás al terminar
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al actualizar: $e')),
+          );
+        }
       }
       finally {
-        if (mounted) setState(() => _isSaving = false);
+        if (mounted) setState(() => _isSaving = false);  // Volvemos a activar el botón después de guardar
       }
     }
   }
@@ -107,6 +112,11 @@ class _EditBookScreenState extends State<EditBookScreen> {
               ),
               const SizedBox(height: 10),
               TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(labelText: 'Precio (€):'),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -118,9 +128,16 @@ class _EditBookScreenState extends State<EditBookScreen> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _stockController,
+                decoration: const InputDecoration(labelText: 'Existencias:'),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.trim().isEmpty ? '¿Cuantas existencias hay?' : null,
+              ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: _saveChanges,
+                onPressed: _isSaving ? null :_saveChanges,  // Desactivamos el botón mientras se guarda
                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(15)),
                 child: const Text('Actualizar libro', style: TextStyle(fontSize: 18)),
               ),

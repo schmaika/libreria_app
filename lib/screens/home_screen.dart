@@ -3,13 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:libreria_app/firebase_service.dart';
 import 'package:libreria_app/models/book.dart';
 import 'package:libreria_app/screens/add_Book_Screen.dart';
-import 'package:libreria_app/firebase_service.dart';
-import 'package:libreria_app/models/book.dart';
-import 'package:libreria_app/screens/add_book_screen.dart';
 import 'book_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
   const HomeScreen({super.key});
 
   @override
@@ -30,8 +26,6 @@ class HomeScreen extends StatelessWidget {
 
       body: StreamBuilder<List<Book>>(
         stream: getBooksStream(),
-      body: StreamBuilder<List<Book>>(
-        stream: getBooksStream(),
         builder: (context, snapshot) {
           // Cargando
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -44,7 +38,6 @@ class HomeScreen extends StatelessWidget {
           }
 
           final books = snapshot.data ?? [];
-          final books = snapshot.data ?? [];
 
           // Sin datos
           if (books.isEmpty) {
@@ -55,7 +48,6 @@ class HomeScreen extends StatelessWidget {
             itemCount: books.length,
             itemBuilder: (context, index) {
               final book = books[index];
-              final book = books[index];
 
               return GestureDetector(
                 onTap: () {
@@ -63,22 +55,7 @@ class HomeScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => BookDetailScreen(
-                        docId: book.docId!,
-                        title: book.title,
-                        author: book.author,
-                        isbn: book.isbn,
-                        description: book.description,
-                        //imageUrl: book.imageUrl,
-                        price: book.price,
-                        isAvailable: book.isAvailable,
-                        docId: book.docId!,
-                        title: book.title,
-                        author: book.author,
-                        isbn: book.isbn,
-                        description: book.description,
-                        //imageUrl: book.imageUrl,
-                        price: book.price,
-                        isAvailable: book.isAvailable,
+                        book: book,
                       ),
                     ),
                   );
@@ -114,7 +91,6 @@ class HomeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              book.title,
                               book.title,
                               style: const TextStyle(
                                 fontSize: 16,

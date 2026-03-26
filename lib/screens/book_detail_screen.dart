@@ -1,34 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:libreria_app/firebase_service.dart';
-import 'package:libreria_app/screens/edit_book_screen.dart';
+import 'package:libreria_app/screens/edit_Book_Screen.dart';
+import 'package:libreria_app/models/book.dart';
 
 class BookDetailScreen extends StatelessWidget {
-  final String docId;
-  final String isbn;
-  final String title;
-  final String author;
-  final String description;
-  //final String imageUrl;
-  final double price;
-  final bool isAvailable;
+  final Book book;
 
   const BookDetailScreen({
     super.key,
-    required this.docId,
-    required this.isbn,
-    required this.title,
-    required this.author,
-    required this.description,
-    //required this.imageUrl,
-    required this.price,
-    required this.isAvailable,
+    required this.book,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(book.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,7 +25,7 @@ class BookDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              title,
+              book.title,
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -48,7 +35,7 @@ class BookDetailScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             Text(
-              author,
+              book.author,
               style: const TextStyle(color: Colors.grey),
             ),
 
@@ -67,17 +54,13 @@ class BookDetailScreen extends StatelessWidget {
             ),
             
             const SizedBox(height: 10),
-            //Botón para editar la información del libro (solo para admin)
+
+            //Botón para editar la información del libro
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context) => EditBookScreen(
-                  docId: docId,
-                  title: title,
-                  author: author,
-                  isbn: isbn,
-                  price: price,
-                )));
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => EditBookScreen(book: book),
+                ));
               },
               child: const Text('Editar Información'),
             ),
@@ -95,7 +78,7 @@ class BookDetailScreen extends StatelessWidget {
                   builder: (ctx) => AlertDialog(
                     title: const Text('Eliminar libro'),
                     content: Text(
-                        '¿Estás seguro de que quieres eliminar "$title"?'),
+                        '¿Estás seguro de que quieres eliminar "${book.title}"?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
@@ -111,7 +94,7 @@ class BookDetailScreen extends StatelessWidget {
                 );
 
                 if (confirm == true) {
-                  await deleteBook(docId);
+                  await deleteBook(book.docId);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -129,3 +112,4 @@ class BookDetailScreen extends StatelessWidget {
     );
   }
 }
+

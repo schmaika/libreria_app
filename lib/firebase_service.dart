@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 
 FirebaseFirestore baseDatos = FirebaseFirestore.instance;
 
-//Obtener la lista de libros desde la base de datos
+// Gestionar las operaciones con la base de datos para los libros
+
+// Obtener la lista de libros desde la base de datos
 Future<List<Book>> getBooks() async {
   try {
     QuerySnapshot snapshot = await baseDatos.collection("books").get();
@@ -71,4 +73,28 @@ Future<bool> isBookAvailable(String docId) async {
   } else {
     throw Exception('El libro no esta disponible');
   }
+}
+
+
+// Gestion de usuarios en la base de datos
+
+
+// Guardar email y UID de un usuario en la base de datos y asignarle el rol de "usuario"
+Future<void> saveUserData(String uid, String email) async {
+  await baseDatos.collection("users").doc(uid).set({
+    'uid': uid,
+    'email': email,
+    'role': 'usuario', // Asignar el rol de "usuario"
+    'createdAt': FieldValue.serverTimestamp(),
+  });
+}
+
+// Comprobar si un usuario es admin
+Future<bool> isAdmin(String uid) async {
+  DocumentSnapshot doc = await baseDatos.collection("users").doc(uid).get();
+  if (doc.exists) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return data['role'] == 'admin';
+  }
+  return false;
 }

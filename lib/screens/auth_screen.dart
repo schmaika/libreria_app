@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:libreria_app/firebase_service.dart';
+
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -9,8 +11,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   final auth = FirebaseAuth.instance;
 
@@ -18,16 +20,22 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> submit() async {
     try {
-      if (isLogin) {
+      if (isLogin) {      // Login
         await auth.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
         );
-      } else {
-        await auth.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
+      } else {            // Registro
+        UserCredential cred = await auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
         );
+        // Guardar el nuevo usuario en la base de datos con rol "usuario"
+        await saveUserData(
+          cred.user!.uid,
+          _emailController.text.trim(),
+        );
+
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -51,11 +59,11 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Column(
           children: [
             TextField(
-              controller: emailController,
+              controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
-              controller: passwordController,
+              controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
