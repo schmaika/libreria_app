@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
+  final String bookId;
 
   const BookDetailScreen({
     super.key,
     required this.title,
     required this.author,
+    required this.bookId,
   });
 
   @override
@@ -19,10 +23,8 @@ class BookDetailScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.book, size: 100),
-            const SizedBox(height: 20),
-
             Text(
               title,
               style: const TextStyle(
@@ -30,26 +32,70 @@ class BookDetailScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 10),
-
-            Text(
-              author,
-              style: const TextStyle(color: Colors.grey),
-            ),
-
+            Text(author),
             const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Reservar'),
-            ),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
 
-            const SizedBox(height: 10),
+                      if (user == null) return;
 
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Comprar'),
+                      final now = DateTime.now();
+                      final returnDate = now.add(const Duration(days: 14));
+
+                      // Comprobar si ya existe reserva
+                      final existing = await FirebaseFirestore.instance
+                            .collection('reservations')
+                            .where('userId', isEqualTo: user.uid)
+                            .where('title', isEqualTo: title)
+                            .get();
+
+                      if (existing.docs.isNotEmpty) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Ya has reservado este libro'))
+                        );
+                        return;
+                      }
+
+                      // Guardar si no existe
+                      await FirebaseFirestore.instance.collection('reservations').add({
+                        'bookId': bookId, // nuevo
+                        'title': title,
+                        'author': author,
+                        'userId': user.uid,
+                        'reservationDate': now.toString(),
+                        'returnDate': returnDate.toString(), 
+                      });
+
+                      if (!context.mounted) return;
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Reserva guardada 🔥')),
+                      );
+                    },
+                    child: const Text('Reservar'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Compra no disponible aún 💸'),
+                        ),
+                      );
+                    },
+                    child: const Text('Comprar'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
