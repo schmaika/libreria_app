@@ -5,6 +5,7 @@ class Book {
   final String isbn;
   final String title;
   final String author;
+  final String category;
   final String description;
   //final String imageUrl;
   final double price;
@@ -15,7 +16,8 @@ class Book {
     required this.docId,
     required this.isbn,
     required this.title,
-    required this.author,
+    this.author = 'Anónimo',
+    this.category = 'Sin categoría',
     required this.description,
     //required this.imageUrl,
     required this.price,
@@ -30,6 +32,7 @@ class Book {
       isbn: data['isbn'] ?? '',
       title: data['title'] ?? 'Sin título',
       author: data['author'] ?? 'Anónimo',
+      category: data['category'] ?? 'Sin categoría',
       description: data['description'] ?? '',
       //imageUrl: data['imageUrl'] ?? '',
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
@@ -44,6 +47,7 @@ class Book {
       'isbn': isbn,
       'title': title,
       'author': author,
+      'category': category,
       'description': description,
       //'imageUrls': imageUrl,
       'price': price,
@@ -56,6 +60,7 @@ class Book {
     String? isbn,
     String? title,
     String? author,
+    String? category,
     String? description,
     double? price,
     int? stock,
@@ -66,6 +71,7 @@ class Book {
       isbn: isbn ?? this.isbn,
       title: title ?? this.title,
       author: author ?? this.author,
+      category: category ?? this.category,
       description: description ?? this.description,
       price: price ?? this.price,
       stock: stock ?? this.stock,

@@ -17,9 +17,10 @@ class EditBookScreen extends StatefulWidget {
 class _EditBookScreenState extends State<EditBookScreen> {
   //Controladores para capturar el texto
   final _formKey = GlobalKey<FormState>();
+  late TextEditingController _isbnController;
   late TextEditingController _titleController;
   late TextEditingController _authorController;
-  late TextEditingController _isbnController;
+  late TextEditingController _categoryController;
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
   late TextEditingController _stockController;
@@ -29,9 +30,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
   @override
   void initState() {
     super.initState();
+    _isbnController = TextEditingController(text: widget.book.isbn);
     _titleController = TextEditingController(text: widget.book.title);
     _authorController = TextEditingController(text: widget.book.author);
-    _isbnController = TextEditingController(text: widget.book.isbn);
+    _categoryController = TextEditingController(text: widget.book.category);
     _descriptionController = TextEditingController(text: widget.book.description);
     _priceController = TextEditingController(text: widget.book.price.toString());
     _stockController = TextEditingController(text: widget.book.stock.toString());
@@ -39,9 +41,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
 
   @override
   void dispose() {
+    _isbnController.dispose();
     _titleController.dispose();
     _authorController.dispose();
-    _isbnController.dispose();
+    _categoryController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
     _stockController.dispose();
@@ -54,9 +57,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
       setState(() => _isSaving = true);  //desactivamos el botón mientras se guarda
       try {
         final updatedBook = widget.book.copyWith(
+          isbn: _isbnController.text.trim(),
           title: _titleController.text.trim(),
           author: _authorController.text.trim(),
-          isbn: _isbnController.text.trim(),
+          category: _categoryController.text.trim(),
           description: _descriptionController.text.trim(),
           price: double.tryParse(_priceController.text) ?? 0.0,
           stock: int.tryParse(_stockController.text) ?? 0,
@@ -94,6 +98,12 @@ class _EditBookScreenState extends State<EditBookScreen> {
           child: ListView(
             children: [
               TextFormField(
+                controller: _isbnController,
+                decoration: const InputDecoration(labelText: 'ISBN:'),
+                validator: (value) => value!.isEmpty ? 'Pon un ISBN' : null,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Título:'),
                 validator: (value) => value!.isEmpty ? 'Pon un título' : null,
@@ -106,9 +116,9 @@ class _EditBookScreenState extends State<EditBookScreen> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                controller: _isbnController,
-                decoration: const InputDecoration(labelText: 'ISBN:'),
-                validator: (value) => value!.isEmpty ? 'Pon un ISBN' : null,
+                controller: _categoryController,
+                decoration: const InputDecoration(labelText: 'Categoría:'),
+                validator: (value) => value!.isEmpty ? 'Pon una categoría (opcional)': null,
               ),
               const SizedBox(height: 10),
               TextFormField(

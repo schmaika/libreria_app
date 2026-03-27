@@ -12,9 +12,10 @@ class AddBookScreen extends StatefulWidget {
 class _AddBookScreenState extends State<AddBookScreen> {
   //Controladores para capturar el texto
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _isbnController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
-  final TextEditingController _isbnController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _stockController = TextEditingController();
@@ -23,9 +24,10 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   @override
   void dispose() {
+    _isbnController.dispose();
     _titleController.dispose();
     _authorController.dispose();
-    _isbnController.dispose();
+    _categoryController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
     _stockController.dispose();
@@ -38,9 +40,10 @@ class _AddBookScreenState extends State<AddBookScreen> {
       setState(() => _isSaving = true);
       try {
         await addBook({
+          'isbn': _isbnController.text.trim(),
           'title': _titleController.text.trim(),
           'author': _authorController.text.trim(),
-          'isbn': _isbnController.text.trim(),
+          'category': _categoryController.text.trim(),
           'description': _descriptionController.text.trim(),
           'price': double.tryParse(_priceController.text) ?? 0.0,
           'stock': int.tryParse(_stockController.text) ?? 0,
@@ -75,6 +78,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
           child: ListView(
             children: [
               TextFormField(
+                controller: _isbnController,
+                decoration: const InputDecoration(labelText: 'ISBN'),
+                validator: (value) => value!.isEmpty ? 'Pon un ISBN' : null,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Título'),
                 validator: (value) => value!.isEmpty ? 'Pon un título' : null,
@@ -87,9 +96,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                controller: _isbnController,
-                decoration: const InputDecoration(labelText: 'ISBN'),
-                validator: (value) => value!.isEmpty ? 'Pon un ISBN' : null,
+                controller: _categoryController,
+                decoration: const InputDecoration(labelText: 'Categoría'),
+                validator: (value) => value!.isEmpty ? 'Pon una categoría (opcional)' : null,
               ),
               const SizedBox(height: 10),
               TextFormField(
