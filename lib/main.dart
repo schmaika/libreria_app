@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter/material.dart' show MaterialApp, runApp;
 import 'screens/home_screen.dart'; // Asegúrate de que esta ruta sea correcta
 
 void main() {
