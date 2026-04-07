@@ -29,23 +29,21 @@ class _AuthScreenState extends State<AuthScreen> {
           password: passwordController.text.trim(),
         );
       }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Éxito')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('✅ Éxito')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('❌ Error: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isLogin ? 'Login' : 'Registro'),
-      ),
+      appBar: AppBar(title: Text(isLogin ? 'Login' : 'Registro')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -70,9 +68,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   isLogin = !isLogin;
                 });
               },
-              child: Text(isLogin
-                  ? 'Crear cuenta'
-                  : 'Ya tengo cuenta'),
+              child: Text(isLogin ? 'Crear cuenta' : 'Ya tengo cuenta'),
             ),
           ],
         ),

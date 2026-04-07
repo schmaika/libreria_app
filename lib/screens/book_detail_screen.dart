@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final String title;
@@ -20,82 +19,49 @@ class BookDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
             Text(author),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: SizedBox(
+                      height: 400,
+                      width: 300,
+                      child: TableCalendar(
+                        firstDay: DateTime.now(),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: DateTime.now(),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          // 1. Cerramos el calendario
+                          Navigator.pop(context);
 
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final user = FirebaseAuth.instance.currentUser;
-
-                      if (user == null) return;
-
-                      final now = DateTime.now();
-                      final returnDate = now.add(const Duration(days: 14));
-
-                      // Comprobar si ya existe reserva
-                      final existing = await FirebaseFirestore.instance
-                            .collection('reservations')
-                            .where('userId', isEqualTo: user.uid)
-                            .where('title', isEqualTo: title)
-                            .get();
-
-                      if (existing.docs.isNotEmpty) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Ya has reservado este libro'))
-                        );
-                        return;
-                      }
-
-                      // Guardar si no existe
-                      await FirebaseFirestore.instance.collection('reservations').add({
-                        'bookId': bookId, // nuevo
-                        'title': title,
-                        'author': author,
-                        'userId': user.uid,
-                        'reservationDate': now.toString(),
-                        'returnDate': returnDate.toString(), 
-                      });
-
-                      if (!context.mounted) return;
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Reserva guardada 🔥')),
-                      );
-                    },
-                    child: const Text('Reservar'),
+                          // 2. Mostramos el mensaje de confirmación
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Reserva realizada para el: ${selectedDay.day}/${selectedDay.month}/${selectedDay.year}',
+                              ),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Compra no disponible aún 💸'),
-                        ),
-                      );
-                    },
-                    child: const Text('Comprar'),
-                  ),
-                ),
-              ],
+                );
+              },
+              child: const Text("Reservar Ahora"),
             ),
           ],
         ),
