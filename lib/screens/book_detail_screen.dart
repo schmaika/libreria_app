@@ -4,11 +4,13 @@ import 'package:table_calendar/table_calendar.dart';
 class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
+  final String bookId;
 
   const BookDetailScreen({
     super.key,
     required this.title,
     required this.author,
+    required this.bookId,
   });
 
   @override

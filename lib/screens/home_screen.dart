@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'book_detail_screen.dart';
+import 'my_reservations_screen.dart'; // 🔥 NUEVO
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,6 +14,20 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Librería 📚'),
         actions: [
+          // BOTÓN MIS RESERVAS
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyReservationsScreen(),
+                ),
+              );
+            },
+          ),
+
+          // LOGOUT
           IconButton(
             onPressed: () => FirebaseAuth.instance.signOut(),
             icon: const Icon(Icons.logout),
