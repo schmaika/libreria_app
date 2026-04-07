@@ -5,7 +5,11 @@ class BookDetailScreen extends StatelessWidget {
   final String title;
   final String author;
 
-  BookDetailScreen({required this.title, required this.author});
+  const BookDetailScreen({
+    super.key,
+    required this.title,
+    required this.author,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +21,12 @@ class BookDetailScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(title,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             Text(author),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 showDialog(
@@ -30,18 +36,30 @@ class BookDetailScreen extends StatelessWidget {
                       height: 400,
                       width: 300,
                       child: TableCalendar(
-                        firstDay: DateTime.utc(2024, 1, 1),
+                        firstDay: DateTime.now(),
                         lastDay: DateTime.utc(2030, 12, 31),
                         focusedDay: DateTime.now(),
                         onDaySelected: (selectedDay, focusedDay) {
+                          // 1. Cerramos el calendario
                           Navigator.pop(context);
+
+                          // 2. Mostramos el mensaje de confirmación
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Reserva realizada para el: ${selectedDay.day}/${selectedDay.month}/${selectedDay.year}',
+                              ),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
                         },
                       ),
                     ),
                   ),
                 );
               },
-              child: Text("Reservar Ahora"),
+              child: const Text("Reservar Ahora"),
             ),
           ],
         ),
