@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -23,23 +24,64 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.now(),
+            firstDay: DateTime.utc(2024, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
             },
-            onDaySelected: (selectedDay, focusedDay) {
+            onDaySelected: (selectedDay, focusedDay) async {
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
-            },
-            onFormatChanged: (format) {
-              setState(() {
-                _calendarFormat = format;
-              });
+
+              try {
+                await FirebaseFirestore.instance
+                    .collection('reservations')
+                    .add({
+                  'title': 'Reserva de Libro',
+                  'date': selectedDay,
+                  'createdAt': FieldValue.serverTimestamp(),
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('¡Reserva enviada a Firebase! 🚀'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                print("Error: $e");
+              }
+              try {
+                await FirebaseFirestore.instance
+                    .collection('reservations')
+                    .add({
+                  'title': 'Libro Reservado',
+                  'date': selectedDay,
+                  'createdAt': FieldValue.serverTimestamp(),
+                  'status': 'confirmada',
+                });
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Reserva guardada: ${selectedDay.day}/${selectedDay.month}',
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                print("Error: $e");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al guardar'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             // Estilo del calendario
             calendarStyle: const CalendarStyle(
